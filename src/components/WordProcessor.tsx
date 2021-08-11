@@ -1,8 +1,8 @@
 
 import { PureComponent, ChangeEvent, useState ,useEffect } from "react";
 import WordProcessorDataService from "../services/word-processor.service";
-import IWordProcessorType from '../types/word-processor.type';
 import {Row, Col, Container,InputGroup,FormControl, Button} from 'react-bootstrap';
+import Loader from "react-loader-spinner";
 
 export default class Fetchdetails extends PureComponent<any,any>{
  constructor(props:any) {
@@ -10,14 +10,15 @@ export default class Fetchdetails extends PureComponent<any,any>{
     this.getDetailsForUrl=this.getDetailsForUrl.bind(this);
      this.onChangeUrl = this.onChangeUrl.bind(this);
      this.onChangeResponse = this.onChangeResponse.bind(this);
-        this.onChangeHistory = this.onChangeHistory.bind(this);
-
+     this.onChangeHistory = this.onChangeHistory.bind(this);
+     this.onChangeLoader = this.onChangeLoader.bind(this);
     this.state = {
        url: "" ,
        result: null,
        history:null,
        historyView:false,
-       resultView:false
+       resultView:false,
+       loader:false
     };
 
   }
@@ -40,6 +41,11 @@ export default class Fetchdetails extends PureComponent<any,any>{
 
 
                 }
+      onChangeLoader(data:boolean){
+                     this.setState({
+                            loader:data
+                         });
+                     }
 
                    onChangeHistory(data:any){
                                 this.setState({
@@ -54,9 +60,11 @@ export default class Fetchdetails extends PureComponent<any,any>{
 
         async fetchDetails(){
 
+            this.onChangeLoader(true);
             let data=await this.getDetailsForUrl();
             console.log(data);
             this.onChangeResponse(data);
+            this.onChangeLoader(false);
 
 
         }
@@ -98,7 +106,7 @@ export default class Fetchdetails extends PureComponent<any,any>{
 
 render() {
 
-    const { url, result, history ,resultView,historyView} = this.state;
+    const { url, result, history ,resultView,historyView,loader} = this.state;
 
 
         return(
@@ -130,6 +138,13 @@ render() {
                          </Col>
                      </Row>
                      <Row>
+                    {loader?<Loader
+                                    type="Puff"
+                                    color="#00BFFF"
+                                    height={100}
+                                    width={100}
+                                    timeout={20000} //3 secs
+                                  />:null}
                     {result&&resultView?(
                                    <ul>
                                   {Object.keys(result).map(function(keyName, keyIndex) {
